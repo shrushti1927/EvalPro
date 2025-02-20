@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Calculator</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+            background: #e3e3e3;
+            position: relative;
+        }
+        .dark-mode {
+            background: #222;
+            color: white;
+        }
+        .calc-main {
+            width: 380px;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            transition: 0.3s;
+        }
+        .dark-mode .calc-main {
+            background: #333;
+            box-shadow: 10px 10px 30px rgba(255, 255, 255, 0.1);
+        }
+        .display-box {
+            background: #ffe6ea;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: right;
+            font-size: 20px;
+            color: #ab4a62;
+            font-weight: bold;
+        }
+        .dark-mode .display-box {
+            background: #444;
+            color: #ff99b5;
+        }
+        .result {
+            font-size: 35px;
+            color: black;
+        }
+        .dark-mode .result {
+            color: #ff4d79;
+        }
+        .calc {
+            width: 75px;
+            height: 75px;
+            margin: 5px;
+            font-size: 22px;
+            border-radius: 50%;
+            border: none;
+            transition: all 0.2s;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+            background: #ff99b5;
+            color: white;
+        }
+        .dark-mode .calc {
+            background: #555;
+            color: white;
+        }
+        .calc:hover {
+            transform: scale(1.1);
+        }
+        .op {
+            background: #ff4d79;
+        }
+        .dark-mode .op {
+            background: #ff6b81;
+        }
+        .equal {
+            width: 160px;
+            border-radius: 20px;
+            background: #ff4d79;
+        }
+        .dark-mode .equal {
+            background: #ff6b81;
+        }
+        .clear {
+            background: #d6336c;
+        }
+        .back {
+            background: #ff6b81;
+        }
+        .toggle-mode {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .dark-mode .toggle-mode {
+            background: white;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <button class="toggle-mode" onclick="toggleMode()">🌙</button> 
+    <div class="calc-main">
+        <div class="display-box">
+            <div id="expression"></div>
+            <div class="result" id="display">0</div>
+        </div>
+        <div>
+            <button class="calc clear" onclick="clearDisplay()">AC</button>
+            <button class="calc back" onclick="backspace()">⌫</button>
+            <button class="calc op" onclick="appendValue('%')">%</button>
+            <button class="calc op" onclick="square()">x²</button>
+
+            <button class="calc num" onclick="appendValue('1')">1</button>
+            <button class="calc num" onclick="appendValue('2')">2</button>
+            <button class="calc num" onclick="appendValue('3')">3</button>
+            <button class="calc op" onclick="appendValue('+')">+</button>
+
+            <button class="calc num" onclick="appendValue('4')">4</button>
+            <button class="calc num" onclick="appendValue('5')">5</button>
+            <button class="calc num" onclick="appendValue('6')">6</button>
+            <button class="calc op" onclick="appendValue('-')">-</button>
+
+            <button class="calc num" onclick="appendValue('7')">7</button>
+            <button class="calc num" onclick="appendValue('8')">8</button>
+            <button class="calc num" onclick="appendValue('9')">9</button>
+            <button class="calc op" onclick="appendValue('*')">x</button>
+
+            <button class="calc num" onclick="appendValue('.')">.</button>
+            <button class="calc num" onclick="appendValue('0')">0</button>
+            <button class="calc equal" onclick="calculateResult()">=</button>
+            <button class="calc op" onclick="sqrt()">√x</button>
+            <button class="calc op" onclick="reciprocal()">1/x</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById("display");
+        let expressionBox = document.getElementById("expression");
+        let newCalculation = false;
+
+        function appendValue(value) {
+            if (newCalculation) {
+                display.innerText = "";
+                expressionBox.innerText = "";
+                newCalculation = false;
+            }
+            display.innerText += value;
+            updateExpression();
+        }
+        
+        function clearDisplay() {
+            display.innerText = "0";
+            expressionBox.innerText = "";
+            newCalculation = false;
+        }
+        
+        function backspace() {
+            display.innerText = display.innerText.slice(0, -1);
+            updateExpression();
+        }
+
+        function square() {
+            display.innerText = Math.pow(parseFloat(display.innerText), 2);
+            newCalculation = true;
+        }
+
+        function sqrt() {
+            display.innerText = Math.sqrt(parseFloat(display.innerText)).toFixed(5);
+            newCalculation = true;
+        }
+
+        function reciprocal() {
+            display.innerText = (1 / parseFloat(display.innerText)).toFixed(5);
+            newCalculation = true;
+        }
+
+        function calculateResult() {
+            try {
+                expressionBox.innerText = display.innerText + " =";
+                display.innerText = eval(display.innerText);
+                newCalculation = true;
+            } catch {
+                display.innerText = "Error";
+                newCalculation = true;
+            }
+        }
+
+        function updateExpression() {
+        try {
+            let result = eval(display.innerText);
+            if (!isNaN(result)) {
+                expressionBox.innerText = display.innerText + " = " + result;
+            } else {
+                expressionBox.innerText = "";
+            }
+        } catch {
+            expressionBox.innerText = "";
+        }
+    }
+
+        function toggleMode() {
+            document.body.classList.toggle("dark-mode");
+        }
+    </script>
+</body>
+</html>
